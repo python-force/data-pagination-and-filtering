@@ -1,0 +1,15 @@
+venv
+.idea
+.idea/vcs.xml
+idea
+.env
+staticfiles
+.DS_Store
+db.dump
+db-heroku.dump
+hunterbarnes/media
+production.dump
+dbs
+db2.dump
+dump.db
+ASSETS
