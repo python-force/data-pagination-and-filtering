@@ -2,14 +2,33 @@
 Treehouse Techdegree:
 FSJS Project 2 - Data Pagination and Filtering
 */
+
+// Set how many students visible per page
 const cardsPerPage = 9;
-var buttonList = ""
+
+// Buttons - represents how many pages
+var buttonList = "";
+
+// Init state for pages
 var pages = 0
+
+// Init state fpr students per page (by search or by database)
 var students_per_page = []
-var searchButton = ""
+
+// Not to change initial data, working with search data
 var adjustedData = data
+
+// Instance variable in case no students found
 var databaseStatus = true
+
+// Title of the page used as well for Not found message
 const h2Element = document.getElementsByTagName('h2')[0]
+
+// Init state for search button
+var searchButton = ""
+
+// Init state for search button
+var searchBox = ""
 
 /*
 For assistance:
@@ -17,6 +36,12 @@ For assistance:
    Reach out in your Slack community: https://treehouse-fsjs-102.slack.com/app_redirect?channel=unit-2
 */
 
+
+/*
+Search input:
+   Placing search input to the page
+   Selecting search button
+*/
 function search() {
     cleanHTML =
         `
@@ -27,11 +52,13 @@ function search() {
         `
     h2Element.insertAdjacentHTML('afterend', cleanHTML);
     searchButton = document.getElementsByTagName("button")[0]
+    searchBox = document.getElementById("search")
 }
 
 /*
-Create the `showPage` function
-This function will create and insert/append the elements needed to display a "page" of nine students
+`showPage` function:
+   Placing search input to the page
+   Selecting search button
 */
 
 function adjustData(search = "") {
@@ -48,6 +75,14 @@ function adjustData(search = "") {
     }
 }
 
+
+/*
+`calculatePages` function:
+    If search is being used - use adjustData function to adjust pool of students to use
+    If pagination is used - use entire pool of data
+    Once pool is being selected:
+        Add students per page array to students_per_page list
+*/
 function calculatePages(search = "") {
     if (search) {
         adjustData(search)
@@ -76,6 +111,10 @@ function calculatePages(search = "") {
 
 }
 
+/*
+`generateData` function:
+   Set proper data for each student - preparation for HTML
+*/
 function generateData(page = 0, search = "") {
     let students = []
     for (let i = 0; i < students_per_page[page].length ; i++) {
@@ -89,6 +128,10 @@ function generateData(page = 0, search = "") {
     return students;
 }
 
+/*
+`generateHTML` function:
+   Final result of students (search or buttons) - generating HTML
+*/
 function generateHTML(page= 0, search = "") {
     let cleanHTML = "";
     let students = generateData(page, search)
@@ -110,7 +153,12 @@ function generateHTML(page= 0, search = "") {
     return cleanHTML;
 }
 
-function showStudents(page = 0, search = "") {
+/*
+`showPage` function:
+   Consisting of more functions for individual task
+   Append final result number of students and final HTML to a page
+*/
+function showPage(page = 0, search = "") {
     finalHTML = generateHTML(page, search)
     document.getElementsByClassName("student-list")[0].innerHTML = finalHTML
 }
@@ -120,7 +168,7 @@ Create the `addPagination` function
 This function will create and insert/append the elements needed for the pagination buttons
 */
 
-function addPageButtons(page = 1, search = "") {
+function addPagination(page = 1, search = "") {
     pages = calculatePages(search)
     let pageHTML = "";
     for (let i = 1; i <= pages; i++) {
@@ -146,35 +194,67 @@ function addPageButtons(page = 1, search = "") {
 }
 
 // Call functions
+// Add search to page
 search();
-addPageButtons();
-showStudents();
 
+// Add pagination to page
+addPagination();
+
+// Add students to page or Not found
+showPage();
+
+
+/*
+Event listener for UL filtering only buttons
+Click event just for the buttons and not whitespace between them
+*/
 buttonList.addEventListener('click', (e) => {
     let activeElement = e.target
     if (activeElement.tagName == 'BUTTON') {
-        addPageButtons(parseInt(activeElement.textContent));
-        showStudents(parseInt(activeElement.textContent)-1);
+        addPagination(parseInt(activeElement.textContent));
+        showPage(parseInt(activeElement.textContent)-1);
         students_per_page = []
     }
     console.log(e.target)
 });
 
-searchButton.addEventListener('click', (e) => {
-    console.log(e.target)
-    searchContent = document.getElementById("search").value
+
+/*
+showResults function for event listeners Button Search and Search input
+*/
+function showResults() {
+    searchContent = document.getElementById("search").value.toLowerCase()
     students_per_page = []
     adjustedData = data
-    addPageButtons(1, searchContent);
+    addPagination(1, searchContent);
     if (databaseStatus) {
         h2Element.innerHTML = "Students";
-        showStudents(0, searchContent);
+        showPage(0, searchContent);
         students_per_page = []
     } else {
         h2Element.innerHTML = "Not found...";
         document.getElementsByClassName("student-list")[0].innerHTML = ""
         databaseStatus = true
     }
+}
 
-
+/*
+Event listener for search button
+Able to search lowercase / uppercase scenarios
+Take care of not found exception
+*/
+searchButton.addEventListener('click', (e) => {
+    // console.log(e.target)
+    showResults()
 });
+
+/*
+Event listener for search button
+Able to search lowercase / uppercase scenarios
+Take care of not found exception
+*/
+searchBox.addEventListener('keyup', (e) => {
+    // console.log(e.target)
+    showResults()
+});
+
